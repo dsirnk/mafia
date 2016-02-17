@@ -51,7 +51,7 @@
 					</table>
 					<deck class="nowrap"><card ng-repeat="card in cards.extras.concat(cards.stack)" card="{{card.sym}}{{card.symbol}}" color="{{card.color}}" ng-disabled="{{card.extra}}"></card></deck>
 				</div>
-				<players class="col-xs-12 col-md-9 col-sm-8" ng-class="{ 'nowrap': isCol }">
+				<players ng-class="{ 'col-sm-8': isCards }" ng-class="{ 'nowrap': isCol }">
 					<player ng-repeat="player in Players track by $index">
 						<score ng-style="{height:'{{player.score}}px'}"></score>
 						<form class="input-group">
