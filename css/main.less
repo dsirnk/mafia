@@ -1,0 +1,45 @@
+[plain],
+[readonly]
+[disabled] { background: transparent !important; border: 0; box-shadow: none; outline: none; }
+[disabled] { opacity: .5 !important; }
+[required]:not(:valid) + .glyphicon { display: none; }
+
+input {
+	& ~ .close {
+		visibility: hidden; transition: visibility ease-in-out 3s;
+		&:before { content: '\00d7'; }
+	}
+	&:focus ~ .close { visibility: visible; }
+}
+
+.navbar {
+	margin: 0 -15px 15px;
+	&>span.pull-right { padding: 5px 0; }
+}
+
+.nowrap { white-space: nowrap; }
+.nobr {
+	display: block; overflow-x: auto; margin-bottom: 15px;
+	&>* { display: inline-block; vertical-align: bottom; }
+}
+
+players {
+	.nobr;
+	text-align: center;
+	player { margin: 5px; text-align: left; }
+	player .input-group > * { display: table-cell; width: auto !important; line-height: inherit; vertical-align: middle; }
+	player [class*=icon-gun] ~ .icon-skull { visibility: hidden; }
+	score { display: block; width: 50%; margin: auto; background: darkcyan; }
+}
+
+deck {
+	.nobr;
+	card {
+		position: relative; width: 75px; margin-right: -45px; background: ivory; border: 1px solid black; border-radius: 5px;
+		&[color=red] { color: red; border-color: red; }
+		&[disabled] { background: grey; color: lightgrey; border-color: lightgrey; opacity: .75; }
+		&:before,
+		&:after { display: block; content: attr(card); padding: 5px; }
+		&:after { margin-top: 70%; transform: rotateZ(180deg); }
+	}
+}

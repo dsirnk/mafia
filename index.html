@@ -1,0 +1,183 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html ng-app="mafia" class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html ng-app="mafia" class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html ng-app="mafia" class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> <html ng-app="mafia" class="no-js" lang=""> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Mafia</title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="css/whhg.css" />
+		<link rel="stylesheet" href="css/main.css">
+		<script src="js/vendor/angular.1.3.14.min.js"></script>
+		<!-- -->
+		<link rel="stylesheet/less" type="text/css" href="css/main.less" />
+		<script type="text/javascript"></script>
+
+		<script src="js/vendor/less.2.3.1.min.js"></script>
+		<!-- -->
+
+		<script src="js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+	</head>
+	<body ng-controller="MainCtrl" ng-cloak>
+		<div class="container">
+			<nav class="navbar navbar-inverse">
+				<a class="navbar-brand" tabindex="-1" href="#">Mafia</a>
+				<span class="pull-right">
+					<a class="btn glyphicon glyphicon-screenshot" ng-click="Games.init(Mafia)" ng-show="!isCards"></a>
+					<a class="btn glyphicon glyphicon-off" ng-click="reset()"></a>
+					<a class="btn glyphicon glyphicon-book" ng-click="isCards = (storage.game_Cards = !isCards)" ng-class="{ 'btn-info': isCards }"></a>
+					<a class="btn glyphicon glyphicon-equalizer" ng-click="isCol = (storage.game_View = !isCol)" ng-class="'glyphicon-' + (isCol ? 'th-large' : 'stats')"></a>
+				</span>
+				<h4 class="navbar-link text-center">{{date.toLocaleDateString()}}</h4>
+			</nav>
+			<div class="row">
+				<div class="col-xs-12 col-md-3 col-sm-4" ng-show="isCards">
+					<table class="table table-striped">
+						<tr>
+							<td class="text-right">Decks:</td>
+							<td><input plain ng-model="decks" type="number" min="1" onclick="this.select()" />( -{{cards.extra}} )</td>
+						</tr>
+						<tr>
+							<td class="text-right">Hands:</td>
+						  	<td>{{cards.hands}}</td>
+						</tr>
+					</table>
+					<deck class="nowrap"><card ng-repeat="card in cards.extras.concat(cards.stack)" card="{{card.sym}}{{card.symbol}}" color="{{card.color}}" ng-disabled="{{card.extra}}"></card></deck>
+				</div>
+				<players class="col-xs-12 col-md-9 col-sm-8" ng-class="{ 'nowrap': isCol }">
+					<player ng-repeat="player in Players track by $index">
+						<score ng-style="{height:'{{player.score}}px'}"></score>
+						<form class="input-group">
+							<i ng-show="!isCards" ng-class="Roles[player.role || 'civil']" ng-disabled="player.dead"></i>
+							<input plain ng-model="player.name" onclick="this.select()" ng-disabled="player.dead" class="form-control" />
+							<i ng-show="!isCards" ng-class="Roles[player.dead ? 'dead' : 'victim']" ng-focus="Games.set(this.player, 'dead', true)" ng-blur="Games.set(this.player, 'dead', false)" tabindex="-1"></i>
+							<button class="close" ng-click="Players.remove(this)"></button>
+						</form>
+					</player>
+					<player>
+						<form class="input-group" ng-submit="Players.add(this)">
+							<i ng-show="!isCards" class="icon-house"></i>
+							<input plain ng-model="player" ng-blur="player && Players.add(this)" required onclick="this.select()" class="form-control" placeholder="Add {{Players.length + 1 + (['st','nd','rd'][Players.length % 10] || 'th')}} / # of Player(s)" />
+							<button class="close" type="reset"></button>
+						</form>
+					</player>
+				</players>
+			</div>
+		</div>
+		<script src="js/vendor/jquery-1.11.2.min.js"></script>
+
+		<script src="js/vendor/bootstrap.min.js"></script>
+
+		<script src="js/plugins.js"></script>
+		<script src="js/main.js"></script>
+		<script type="text/javascript">
+			;( function ($, w, d, undefined) {
+				angular
+					.module('mafia', [])
+					.controller('MainCtrl', function($scope) {
+						$scope.date 	=	new Date();
+						$scope.storage	=	localStorage;
+						$scope.isCol	=	localStorage.game_View == 'true';
+						$scope.isCards	=	localStorage.game_Cards == 'true';
+						
+						// Players
+
+						$scope.Players	= 	(function() {
+												return angular.extend(angular.fromJson(localStorage.game_Players || '[]'), {
+													add   : function(p) {
+														if (!isNaN(players = parseInt(p.player))) {
+															this.length = 0;
+															while(players) { this.push({ name: this.length + 1, score: 0 }); players--; }
+														} else this.push({ name: p.player, score: 0 });
+														p.player = '';
+													},
+													remove: function(p) { this.splice(this.indexOf(p.player), 1); },
+													random: function(emptyProp) {
+														var player = this[Math.floor(Math.random() * this.length)];
+														return (player && player[emptyProp]) ? this.random(emptyProp) : player;
+													}
+												});
+											})();
+
+						// Cards
+						
+						var suits 		= 	[
+												{ symbol: '♠', suit: 'spades'  , color: 'black' },
+												{ symbol: '♥', suit: 'hearts'  , color: 'red'   },
+												{ symbol: '♦', suit: 'diamonds', color: 'red'   },
+												{ symbol: '♣', suit: 'clubs'   , color: 'black' }
+											];
+						suits.cards 	= 	13;
+
+						$scope.log 		= 	function(s) { console.log(s); };
+						$scope.decks	=   parseInt(localStorage.game_Decks || 1);
+						$scope.cards	=   function() {
+												var total = suits.cards * suits.length * ($scope.decks || 1),
+													stack = total - ($scope.cards.extra = total % ($scope.Players.length || 1));
+												$scope.cards.hands = stack / ($scope.Players.length || 1);
+
+												$scope.cards.stack  = [];
+												$scope.cards.extras = [];
+												for(var weight = suits.cards + 1; weight > 1; weight--)
+												for(var suit = 0, sym = ({ '11':'J','12':'Q','13':'K','14':'A' }[weight] || weight); suit < suits.length; suit++)
+												for(var deck = 0; deck < $scope.decks; deck++) {
+													$scope.cards[(inStack = $scope.cards.stack.length < stack) ? 'stack' : 'extras']
+														.push(angular.extend({
+															weight : weight%14 || 1,
+															sym    : sym,
+															extra  : !(inStack)
+														}, 	suits[suit]));
+												}
+											};
+						$scope.shuffle 	=	function() { $scope.cards.stack.sort(function() { return 0.5 - Math.random(); }); };
+						$scope.reset 	=	function() { $scope.Players.length = $scope.Games.length = 0; $scope.decks = 1; };
+
+						// Mafia
+
+						$scope.Roles	=	{
+												civil  : 'text-muted   icon-house',
+												mafia  : 'text-warning icon-gun',
+												police : 'text-primary icon-police',
+												doctor : 'text-success icon-emergency',
+												victim : 'text-muted   icon-skull',
+												dead   : 'text-danger  icon-skull',
+											};
+						$scope.Mafia	=	function (opts) {
+												var _player,
+													_roles = ['mafia', 'police', 'mafia', 'police', 'doctor'],
+													_maxRoles = $scope.Players.length < 10 ? 3 : _roles.length;
+												if (!$scope.Players.length) return;
+												for (var i = $scope.Players.length - 1; i >= 0; i--) delete $scope.Players[i].role;
+												for (var i = _roles.length - 1; i >= _roles.length - _maxRoles; i--) {
+													if(!(_player = $scope.Players.random('role'))) return;
+													$scope.Games.set(_player, 'role', _roles[i], this);
+												}
+												return this;
+											};
+
+						$scope.Games		=	angular.fromJson(localStorage.game_Games || '[]');
+						$scope.Games.init	= 	function (cl) { return $scope.Players.length && this[this.push(new cl()) - 1]; };
+						$scope.Games.curr	= 	function () { return this[this.length - 1]; };
+						$scope.Games.set	= 	function (player, prop, value, game) {
+													game = game || $scope.Games.curr();
+													(player[prop] = value) && (game[value] = game[value] || []).push(angular.extend({}, player));
+												};
+						$scope.Games.init($scope.Mafia);
+
+						$scope.$watch('[Players, decks, Games]', function (newVal, oldVal, scope) {
+							angular.extend(localStorage, { game_Players: angular.toJson(newVal[0]), game_Decks: newVal[1], game_Games: angular.toJson(newVal[2]) });
+							$scope.cards();
+						}, true);
+						$scope.cards();
+					});
+			})(jQuery,window,document);
+		 </script>
+	</body>
+</html>
