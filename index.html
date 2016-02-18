@@ -31,10 +31,10 @@
 				<a class="navbar-brand" tabindex="-1" href="#">Mafia</a>
 				<span class="pull-right">
 					<a class="btn icon-code" ng-click="debug = !debug" ng-class="{ 'btn-info': debug }" ng-show="!isCards"></a>
-					<a class="btn glyphicon glyphicon-screenshot" ng-click="Games.init(Mafia)" ng-show="!isCards"></a>
-					<a class="btn glyphicon glyphicon-off" ng-click="reset()"></a>
-					<a class="btn glyphicon glyphicon-book" ng-click="isCards = (storage.game_Cards = !isCards)" ng-class="{ 'btn-info': isCards }"></a>
-					<a class="btn glyphicon glyphicon-equalizer" ng-click="isCol = (storage.game_View = !isCol)" ng-class="'glyphicon-' + (isCol ? 'th-large' : 'stats')"></a>
+					<a class="btn icon-gun" ng-click="Games.init(Mafia)" ng-show="!isCards"></a>
+					<a class="btn icon-off" ng-click="reset()"></a>
+					<a class="btn icon-stacks" ng-click="isCards = (storage.game_Cards = !isCards)" ng-class="{ 'btn-info': isCards }"></a>
+					<a class="btn glyphicon" ng-click="isCol = (storage.game_View = !isCol)" ng-class="'glyphicon-' + (isCol ? 'th-large' : 'stats')"></a>
 				</span>
 			</nav>
 			<div class="row">
