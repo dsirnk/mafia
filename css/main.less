@@ -6,7 +6,7 @@
 
 input {
 	& ~ .close {
-		visibility: hidden; transition: visibility ease-in-out 3s;
+		visibility: hidden; line-height: inherit; transition: visibility ease-in-out 3s;
 		&:before { content: '\00d7'; }
 	}
 	&:focus ~ .close { visibility: visible; }
@@ -27,8 +27,6 @@ players {
 	.nobr;
 	text-align: center;
 	player { margin: 5px; text-align: left; }
-	player .input-group > * { display: table-cell; width: auto !important; line-height: inherit; vertical-align: middle; }
-	player [class*=icon-gun] ~ .icon-skull { visibility: hidden; }
 	score { display: block; width: 50%; margin: auto; background: darkcyan; }
 }
 

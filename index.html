@@ -30,12 +30,12 @@
 			<nav class="navbar navbar-inverse">
 				<a class="navbar-brand" tabindex="-1" href="#">Mafia</a>
 				<span class="pull-right">
+					<a class="btn icon-code" ng-click="debug = !debug" ng-class="{ 'btn-info': debug }" ng-show="!isCards"></a>
 					<a class="btn glyphicon glyphicon-screenshot" ng-click="Games.init(Mafia)" ng-show="!isCards"></a>
 					<a class="btn glyphicon glyphicon-off" ng-click="reset()"></a>
 					<a class="btn glyphicon glyphicon-book" ng-click="isCards = (storage.game_Cards = !isCards)" ng-class="{ 'btn-info': isCards }"></a>
 					<a class="btn glyphicon glyphicon-equalizer" ng-click="isCol = (storage.game_View = !isCol)" ng-class="'glyphicon-' + (isCol ? 'th-large' : 'stats')"></a>
 				</span>
-				<h4 class="navbar-link text-center">{{date.toLocaleDateString()}}</h4>
 			</nav>
 			<div class="row">
 				<div class="col-xs-12 col-md-3 col-sm-4" ng-show="isCards">
@@ -54,18 +54,18 @@
 				<players ng-class="{ 'col-sm-8': isCards, 'nowrap': isCol }">
 					<player ng-repeat="player in Players track by $index">
 						<score ng-style="{height:'{{player.score}}px'}"></score>
-						<form class="input-group">
-							<i ng-show="!isCards" ng-class="Roles[player.role || 'civil']" ng-disabled="player.dead"></i>
-							<input plain ng-model="player.name" onclick="this.select()" ng-disabled="player.dead" class="form-control" />
-							<i ng-show="!isCards" ng-class="Roles[player.dead ? 'dead' : 'victim']" ng-focus="Games.set(this.player, 'dead', true)" ng-blur="Games.set(this.player, 'dead', false)" tabindex="-1"></i>
-							<button class="close" ng-click="Players.remove(this)"></button>
-						</form>
+						<input plain ng-model="player.name" onclick="this.select()" class="form-control" />
+						<button class="btn close" ng-click="Players.remove(this)"></button>
+						<i class="btn" ng-show="debug" ng-class="Roles[player.role || 'civil']"></i>
+						<i class="btn" ng-show="!player.dead" ng-class="Roles.patient" tabindex="-1"></i>
+						<i class="btn" ng-show="!player.dead && player.role !== 'mafia'" ng-class="Roles.victim" tabindex="-1"></i>
+						<i class="btn" ng-show="!player.dead && player.role !== 'police'" ng-class="Roles.suspect" tabindex="-1"></i>
 					</player>
 					<player>
-						<form class="input-group" ng-submit="Players.add(this)">
-							<i ng-show="!isCards" class="icon-house"></i>
+						<form ng-submit="Players.add(this)">
 							<input plain ng-model="player" ng-blur="player && Players.add(this)" required onclick="this.select()" class="form-control" placeholder="Add {{Players.length + 1 + (['st','nd','rd'][Players.length % 10] || 'th')}} / # of Player(s)" />
-							<button class="close" type="reset"></button>
+							<i class="icon-groups-friends"></i>
+							<button class="btn close" type="reset"></button>
 						</form>
 					</player>
 				</players>
@@ -142,12 +142,13 @@
 						// Mafia
 
 						$scope.Roles	=	{
-												civil  : 'text-muted   icon-house',
-												mafia  : 'text-warning icon-gun',
-												police : 'text-primary icon-police',
-												doctor : 'text-success icon-emergency',
-												victim : 'text-muted   icon-skull',
-												dead   : 'text-danger  icon-skull',
+												mafia  : 'icon-gun',
+												civil  : 'icon-house',
+												police : 'icon-police',
+												doctor : 'icon-emergency',
+												suspect: 'icon-gun      text-info',
+												victim : 'icon-skull    text-danger',
+												patient: 'icon-hospital text-success',
 											};
 						$scope.Mafia	=	function (opts) {
 												var _player,
